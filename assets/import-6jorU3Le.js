@@ -50,7 +50,20 @@ function combineVersion(major, minor, patch, preRelease2) {
 function parseHyphen(range) {
   return range.replace(
     parseRegex(hyphenRange),
-    (_range, from, fromMajor, fromMinor, fromPatch, _fromPreRelease, _fromBuild, to, toMajor, toMinor, toPatch, toPreRelease) => {
+    (
+      _range,
+      from,
+      fromMajor,
+      fromMinor,
+      fromPatch,
+      _fromPreRelease,
+      _fromBuild,
+      to,
+      toMajor,
+      toMinor,
+      toPatch,
+      toPreRelease
+    ) => {
       if (isXVersion(fromMajor)) {
         from = "";
       } else if (isXVersion(fromMinor)) {
@@ -85,117 +98,144 @@ function parseCaretTrim(range) {
   return range.replace(parseRegex(caretTrim), "$1^");
 }
 function parseCarets(range) {
-  return range.trim().split(/\s+/).map((rangeVersion) => {
-    return rangeVersion.replace(
-      parseRegex(caret),
-      (_, major, minor, patch, preRelease2) => {
-        if (isXVersion(major)) {
-          return "";
-        } else if (isXVersion(minor)) {
-          return `>=${major}.0.0 <${+major + 1}.0.0-0`;
-        } else if (isXVersion(patch)) {
-          if (major === "0") {
-            return `>=${major}.${minor}.0 <${major}.${+minor + 1}.0-0`;
-          } else {
-            return `>=${major}.${minor}.0 <${+major + 1}.0.0-0`;
-          }
-        } else if (preRelease2) {
-          if (major === "0") {
-            if (minor === "0") {
-              return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${minor}.${+patch + 1}-0`;
+  return range
+    .trim()
+    .split(/\s+/)
+    .map((rangeVersion) => {
+      return rangeVersion.replace(
+        parseRegex(caret),
+        (_, major, minor, patch, preRelease2) => {
+          if (isXVersion(major)) {
+            return "";
+          } else if (isXVersion(minor)) {
+            return `>=${major}.0.0 <${+major + 1}.0.0-0`;
+          } else if (isXVersion(patch)) {
+            if (major === "0") {
+              return `>=${major}.${minor}.0 <${major}.${+minor + 1}.0-0`;
             } else {
-              return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${+minor + 1}.0-0`;
+              return `>=${major}.${minor}.0 <${+major + 1}.0.0-0`;
+            }
+          } else if (preRelease2) {
+            if (major === "0") {
+              if (minor === "0") {
+                return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${minor}.${
+                  +patch + 1
+                }-0`;
+              } else {
+                return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${
+                  +minor + 1
+                }.0-0`;
+              }
+            } else {
+              return `>=${major}.${minor}.${patch}-${preRelease2} <${
+                +major + 1
+              }.0.0-0`;
             }
           } else {
-            return `>=${major}.${minor}.${patch}-${preRelease2} <${+major + 1}.0.0-0`;
-          }
-        } else {
-          if (major === "0") {
-            if (minor === "0") {
-              return `>=${major}.${minor}.${patch} <${major}.${minor}.${+patch + 1}-0`;
-            } else {
-              return `>=${major}.${minor}.${patch} <${major}.${+minor + 1}.0-0`;
+            if (major === "0") {
+              if (minor === "0") {
+                return `>=${major}.${minor}.${patch} <${major}.${minor}.${
+                  +patch + 1
+                }-0`;
+              } else {
+                return `>=${major}.${minor}.${patch} <${major}.${
+                  +minor + 1
+                }.0-0`;
+              }
             }
+            return `>=${major}.${minor}.${patch} <${+major + 1}.0.0-0`;
           }
-          return `>=${major}.${minor}.${patch} <${+major + 1}.0.0-0`;
         }
-      }
-    );
-  }).join(" ");
+      );
+    })
+    .join(" ");
 }
 function parseTildes(range) {
-  return range.trim().split(/\s+/).map((rangeVersion) => {
-    return rangeVersion.replace(
-      parseRegex(tilde),
-      (_, major, minor, patch, preRelease2) => {
-        if (isXVersion(major)) {
-          return "";
-        } else if (isXVersion(minor)) {
-          return `>=${major}.0.0 <${+major + 1}.0.0-0`;
-        } else if (isXVersion(patch)) {
-          return `>=${major}.${minor}.0 <${major}.${+minor + 1}.0-0`;
-        } else if (preRelease2) {
-          return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${+minor + 1}.0-0`;
+  return range
+    .trim()
+    .split(/\s+/)
+    .map((rangeVersion) => {
+      return rangeVersion.replace(
+        parseRegex(tilde),
+        (_, major, minor, patch, preRelease2) => {
+          if (isXVersion(major)) {
+            return "";
+          } else if (isXVersion(minor)) {
+            return `>=${major}.0.0 <${+major + 1}.0.0-0`;
+          } else if (isXVersion(patch)) {
+            return `>=${major}.${minor}.0 <${major}.${+minor + 1}.0-0`;
+          } else if (preRelease2) {
+            return `>=${major}.${minor}.${patch}-${preRelease2} <${major}.${
+              +minor + 1
+            }.0-0`;
+          }
+          return `>=${major}.${minor}.${patch} <${major}.${+minor + 1}.0-0`;
         }
-        return `>=${major}.${minor}.${patch} <${major}.${+minor + 1}.0-0`;
-      }
-    );
-  }).join(" ");
+      );
+    })
+    .join(" ");
 }
 function parseXRanges(range) {
-  return range.split(/\s+/).map((rangeVersion) => {
-    return rangeVersion.trim().replace(
-      parseRegex(xRange),
-      (ret, gtlt2, major, minor, patch, preRelease2) => {
-        const isXMajor = isXVersion(major);
-        const isXMinor = isXMajor || isXVersion(minor);
-        const isXPatch = isXMinor || isXVersion(patch);
-        if (gtlt2 === "=" && isXPatch) {
-          gtlt2 = "";
-        }
-        preRelease2 = "";
-        if (isXMajor) {
-          if (gtlt2 === ">" || gtlt2 === "<") {
-            return "<0.0.0-0";
-          } else {
-            return "*";
-          }
-        } else if (gtlt2 && isXPatch) {
-          if (isXMinor) {
-            minor = 0;
-          }
-          patch = 0;
-          if (gtlt2 === ">") {
-            gtlt2 = ">=";
-            if (isXMinor) {
-              major = +major + 1;
-              minor = 0;
-              patch = 0;
-            } else {
-              minor = +minor + 1;
-              patch = 0;
+  return range
+    .split(/\s+/)
+    .map((rangeVersion) => {
+      return rangeVersion
+        .trim()
+        .replace(
+          parseRegex(xRange),
+          (ret, gtlt2, major, minor, patch, preRelease2) => {
+            const isXMajor = isXVersion(major);
+            const isXMinor = isXMajor || isXVersion(minor);
+            const isXPatch = isXMinor || isXVersion(patch);
+            if (gtlt2 === "=" && isXPatch) {
+              gtlt2 = "";
             }
-          } else if (gtlt2 === "<=") {
-            gtlt2 = "<";
-            if (isXMinor) {
-              major = +major + 1;
-            } else {
-              minor = +minor + 1;
+            preRelease2 = "";
+            if (isXMajor) {
+              if (gtlt2 === ">" || gtlt2 === "<") {
+                return "<0.0.0-0";
+              } else {
+                return "*";
+              }
+            } else if (gtlt2 && isXPatch) {
+              if (isXMinor) {
+                minor = 0;
+              }
+              patch = 0;
+              if (gtlt2 === ">") {
+                gtlt2 = ">=";
+                if (isXMinor) {
+                  major = +major + 1;
+                  minor = 0;
+                  patch = 0;
+                } else {
+                  minor = +minor + 1;
+                  patch = 0;
+                }
+              } else if (gtlt2 === "<=") {
+                gtlt2 = "<";
+                if (isXMinor) {
+                  major = +major + 1;
+                } else {
+                  minor = +minor + 1;
+                }
+              }
+              if (gtlt2 === "<") {
+                preRelease2 = "-0";
+              }
+              return `${gtlt2 + major}.${minor}.${patch}${preRelease2}`;
+            } else if (isXMinor) {
+              return `>=${major}.0.0${preRelease2} <${+major + 1}.0.0-0`;
+            } else if (isXPatch) {
+              return `>=${major}.${minor}.0${preRelease2} <${major}.${
+                +minor + 1
+              }.0-0`;
             }
+            return ret;
           }
-          if (gtlt2 === "<") {
-            preRelease2 = "-0";
-          }
-          return `${gtlt2 + major}.${minor}.${patch}${preRelease2}`;
-        } else if (isXMinor) {
-          return `>=${major}.0.0${preRelease2} <${+major + 1}.0.0-0`;
-        } else if (isXPatch) {
-          return `>=${major}.${minor}.0${preRelease2} <${major}.${+minor + 1}.0-0`;
-        }
-        return ret;
-      }
-    );
-  }).join(" ");
+        );
+    })
+    .join(" ");
 }
 function parseStar(range) {
   return range.trim().replace(parseRegex(star), "");
@@ -246,7 +286,12 @@ function comparePreRelease(rangeAtom, versionAtom) {
   return 0;
 }
 function compareVersion(rangeAtom, versionAtom) {
-  return compareAtom(rangeAtom.major, versionAtom.major) || compareAtom(rangeAtom.minor, versionAtom.minor) || compareAtom(rangeAtom.patch, versionAtom.patch) || comparePreRelease(rangeAtom, versionAtom);
+  return (
+    compareAtom(rangeAtom.major, versionAtom.major) ||
+    compareAtom(rangeAtom.minor, versionAtom.minor) ||
+    compareAtom(rangeAtom.patch, versionAtom.patch) ||
+    comparePreRelease(rangeAtom, versionAtom)
+  );
 }
 function eq(rangeAtom, versionAtom) {
   return rangeAtom.version === versionAtom.version;
@@ -259,11 +304,15 @@ function compare(rangeAtom, versionAtom) {
     case ">":
       return compareVersion(rangeAtom, versionAtom) < 0;
     case ">=":
-      return eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) < 0;
+      return (
+        eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) < 0
+      );
     case "<":
       return compareVersion(rangeAtom, versionAtom) > 0;
     case "<=":
-      return eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) > 0;
+      return (
+        eq(rangeAtom, versionAtom) || compareVersion(rangeAtom, versionAtom) > 0
+      );
     case void 0: {
       return true;
     }
@@ -272,12 +321,7 @@ function compare(rangeAtom, versionAtom) {
   }
 }
 function parseComparatorString(range) {
-  return pipe(
-    parseCarets,
-    parseTildes,
-    parseXRanges,
-    parseStar
-  )(range);
+  return pipe(parseCarets, parseTildes, parseXRanges, parseStar)(range);
 }
 function parseRange(range) {
   return pipe(
@@ -285,15 +329,22 @@ function parseRange(range) {
     parseComparatorTrim,
     parseTildeTrim,
     parseCaretTrim
-  )(range.trim()).split(/\s+/).join(" ");
+  )(range.trim())
+    .split(/\s+/)
+    .join(" ");
 }
 function satisfy(version, range) {
   if (!version) {
     return false;
   }
   const parsedRange = parseRange(range);
-  const parsedComparator = parsedRange.split(" ").map((rangeVersion) => parseComparatorString(rangeVersion)).join(" ");
-  const comparators = parsedComparator.split(/\s+/).map((comparator2) => parseGTE0(comparator2));
+  const parsedComparator = parsedRange
+    .split(" ")
+    .map((rangeVersion) => parseComparatorString(rangeVersion))
+    .join(" ");
+  const comparators = parsedComparator
+    .split(/\s+/)
+    .map((comparator2) => parseGTE0(comparator2));
   const extractedVersion = extractComparator(version);
   if (!extractedVersion) {
     return false;
@@ -305,7 +356,7 @@ function satisfy(version, range) {
     versionMajor,
     versionMinor,
     versionPatch,
-    versionPreRelease
+    versionPreRelease,
   ] = extractedVersion;
   const versionAtom = {
     version: combineVersion(
@@ -317,7 +368,8 @@ function satisfy(version, range) {
     major: versionMajor,
     minor: versionMinor,
     patch: versionPatch,
-    preRelease: versionPreRelease == null ? void 0 : versionPreRelease.split(".")
+    preRelease:
+      versionPreRelease == null ? void 0 : versionPreRelease.split("."),
   };
   for (const comparator2 of comparators) {
     const extractedComparator = extractComparator(comparator2);
@@ -331,7 +383,7 @@ function satisfy(version, range) {
       rangeMajor,
       rangeMinor,
       rangePatch,
-      rangePreRelease
+      rangePreRelease,
     ] = extractedComparator;
     const rangeAtom = {
       operator: rangeOperator,
@@ -344,7 +396,7 @@ function satisfy(version, range) {
       major: rangeMajor,
       minor: rangeMinor,
       patch: rangePatch,
-      preRelease: rangePreRelease == null ? void 0 : rangePreRelease.split(".")
+      preRelease: rangePreRelease == null ? void 0 : rangePreRelease.split("."),
     };
     if (!compare(rangeAtom, versionAtom)) {
       return false;
@@ -356,17 +408,24 @@ function satisfy(version, range) {
 const currentImports = {};
 
 // eslint-disable-next-line no-undef
-const moduleMap = {'vue':{get:()=>()=>__federation_import(new URL('__federation_shared_vue-ChapN4yw.js', import.meta.url).href),import:true}};
+const moduleMap = {
+  vue: {
+    get: () => () =>
+      __federation_import(new URL("vue-ChapN4yw.js", import.meta.url).href),
+    import: true,
+  },
+};
 const moduleCache = Object.create(null);
-async function importShared(name, shareScope = 'default') {
+async function importShared(name, shareScope = "default") {
   return moduleCache[name]
     ? new Promise((r) => r(moduleCache[name]))
-    : (await getSharedFromRuntime(name, shareScope)) || getSharedFromLocal(name)
+    : (await getSharedFromRuntime(name, shareScope)) ||
+        getSharedFromLocal(name);
 }
 // eslint-disable-next-line
 async function __federation_import(name) {
   currentImports[name] ??= import(name);
-  return currentImports[name]
+  return currentImports[name];
 }
 async function getSharedFromRuntime(name, shareScope) {
   let module = null;
@@ -393,13 +452,13 @@ async function getSharedFromRuntime(name, shareScope) {
     }
   }
   if (module) {
-    return flattenModule(module, name)
+    return flattenModule(module, name);
   }
 }
 async function getSharedFromLocal(name) {
   if (moduleMap[name]?.import) {
     let module = await (await moduleMap[name].get())();
-    return flattenModule(module, name)
+    return flattenModule(module, name);
   } else {
     console.error(
       `consumer config import=false,so cant use callback shared module`
@@ -408,18 +467,22 @@ async function getSharedFromLocal(name) {
 }
 function flattenModule(module, name) {
   // use a shared module which export default a function will getting error 'TypeError: xxx is not a function'
-  if (typeof module.default === 'function') {
+  if (typeof module.default === "function") {
     Object.keys(module).forEach((key) => {
-      if (key !== 'default') {
+      if (key !== "default") {
         module.default[key] = module[key];
       }
     });
     moduleCache[name] = module.default;
-    return module.default
+    return module.default;
   }
   if (module.default) module = Object.assign({}, module.default, module);
   moduleCache[name] = module;
-  return module
+  return module;
 }
 
-export { importShared, getSharedFromLocal as importSharedLocal, getSharedFromRuntime as importSharedRuntime };
+export {
+  importShared,
+  getSharedFromLocal as importSharedLocal,
+  getSharedFromRuntime as importSharedRuntime,
+};
