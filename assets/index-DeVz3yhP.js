@@ -98,7 +98,7 @@ import {
   n as normalizeClass,
   a as normalizeStyle,
   s as stringifyStyle,
-} from "./shared.esm-bundler-z25H-pmD.js";
+} from "./pmD.js";
 
 true &&
   (function polyfill() {
