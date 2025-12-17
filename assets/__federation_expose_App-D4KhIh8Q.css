@@ -1,0 +1,12 @@
+
+.home-box[data-v-bd975769] {
+  display: flex;
+  justify-content: center;
+}
+.btn-fa[data-v-bd975769] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 86vw;
+  margin-top: 15px;
+}
