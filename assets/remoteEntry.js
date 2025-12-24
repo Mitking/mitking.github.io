@@ -2,8 +2,8 @@ const currentImports = {};
 const exportSet = new Set(["Module", "__esModule", "default", "_export_sfc"]);
 let moduleMap = {
   "./App": () => {
-    dynamicLoadingCss(["__federation_expose_App-D4KhIh8Q.css"], false, "./App");
-    return __federation_import("./DPKkHJ1Q.js").then((module) =>
+    dynamicLoadingCss(["DvGYp8gA.css"], false, "./App");
+    return __federation_import("./BdIBSbX9.js").then((module) =>
       Object.keys(module).every((item) => exportSet.has(item))
         ? () => module.default
         : () => module

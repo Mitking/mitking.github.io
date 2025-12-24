@@ -411,7 +411,7 @@ const currentImports = {};
 const moduleMap = {
   vue: {
     get: () => () =>
-      __federation_import(new URL("vue-ChapN4yw.js", import.meta.url).href),
+      __federation_import(new URL("ChapN4yw.js", import.meta.url).href),
     import: true,
   },
 };

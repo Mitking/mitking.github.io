@@ -1,0 +1,17 @@
+.home-box[data-v-22e50b95] {
+  display: flex;
+  justify-content: center;
+}
+.btn-fa[data-v-22e50b95] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 86vw;
+  margin-top: 15px;
+}
+.animal-roll[data-v-22e50b95] {
+  transition: transform 1s;
+}
+.animal-btn[data-v-22e50b95]:active {
+  opacity: 0.5;
+}
